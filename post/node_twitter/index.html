@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Twitter監視プログラムをつくる。 &middot; </title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.15" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://57pfive.bitbucket.org/css/normalize.css">
+        <link rel="stylesheet" href="http://57pfive.bitbucket.org/css/highlight.css">
+        <link rel="stylesheet" href="http://57pfive.bitbucket.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="plsfi" href="http://57pfive.bitbucket.org/">plsfi</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://57pfive.bitbucket.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                        
+                        
+                        
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container" itemscope="" itemtype="http://schema.org/BlogPosting">
+        <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Twitter監視プログラムをつくる。</h1>
+    
+    <p class="post-date">
+        <span>Published <time datetime="2016-06-01" itemprop="datePublished">Wed, Jun 1, 2016</time></span>
+        <span>by</span>
+        <span itemscope="" itemprop="author" itemtype="http://schema.org/Person">
+            <span itemprop="name">
+                <a href="" itemprop="url" rel="author"></a>
+            </span>
+        </span>
+    </p>
+</header>
+
+        <div class="post-content clearfix" itemprop="articleBody">
+    
+
+    
+
+<p>Twitter見るとき、情報量多すぎてめんどくさい。
+フィルタリングかけて、slackとかメールに投げてほしい。</p>
+
+<h2 id="要件:f8e6c8c2cd8c5215e4823f10dd4e1f78">要件</h2>
+
+<ul>
+<li>UserStreamをみてほしい発言が来たら、通知</li>
+<li>定期的に検索回して、ほしい発言が来たら、通知</li>
+</ul>
+
+<p><a href="https://www.npmjs.com/package/twitter">npmのパッケージ</a>のコピペでUserStreamが簡単に組めた。
+飛んでくるJSON見ながら、レーン分け。
+ここまでは早かった。</p>
+
+<p>UserStream部分</p>
+
+<pre><code>function streamfunc(){
+
+var stream = bot.stream('user');
+        stream.on('data', function(data) {
+                var id        = ('user' in data &amp;&amp; 'screen_name' in data.user) ? data.user.screen_name : null;
+                var text      = ('text' in data) ? data.text.replace(new RegExp('^@' + BOT_ID + ' '), '') : '';
+                var ifMention = ('in_reply_to_user_id' in data) ? (data.in_reply_to_user_id !== null) : false;
+                if(data.text === undefined){
+                }else{
+                    //このへんに分岐条件を書く。
+                }
+        });
+  stream.on('error', function(error) {
+    console.log(error);
+    throw error;
+    
+  });
+}
+</code></pre>
+
+<p>検索部分</p>
+
+<pre><code>function searchfunc(sendflg){//sendflg 初回起動時に0 その後は1を入れる。
+
+        bot.get('search/tweets', {q: 'けんさくしたいもじ exclude:retweets'}, function(error,data, response){ //exclude:retweetsでRT除外
+            data.statuses.forEach(function(val,index,ar) {
+                      var flg=0;
+                      for(var i = 0; i &lt; idar.length; i++){ //配列の中身とチェックして既に入ってたら通知しない。
+                         if(idar[i] ===  val.id_str){
+                             flg = 1;
+                         }
+                      }
+                      if(flg == 0){
+                          if(sendflg==1){
+                            slackpost(&quot;https://twitter.com/&quot;+val.user.screen_name+&quot;/status/&quot;+val.id_str,&quot;random&quot;);
+                          }
+                          idar.push(val.id_str);  //同じ通知しないように配列にいれる。
+                      }
+            });
+        });
+});
+</code></pre>
+
+<p>ひとまずこれで満足はしたけど、ほっとくとUserStream接続が切れるということが往々にある。</p>
+
+<p>しばらく定期的に再起動かけてやり過ごしてたけど、apiのドキュメントには、再接続を実装しろって書いてあるので
+おとなしく作る。</p>
+
+<h1 id="userstream再接続にハマる:f8e6c8c2cd8c5215e4823f10dd4e1f78">UserStream再接続にハマる</h1>
+
+<p>npm見てもチュートリアルない。
+ひとまず、error吐いたらfunctionを再起してみる。</p>
+
+<p>setIntervalかけて再起動</p>
+
+<pre><code>var timer = setInterval(function(clearInterval(timer);streamfunc),60000);
+</code></pre>
+
+<p>うまく起動した。</p>
+
+<h2 id="と-思いきや:f8e6c8c2cd8c5215e4823f10dd4e1f78">と、思いきや。</h2>
+
+<pre><code>[Error: Status Code: 420]
+{ [SyntaxError: Unexpected token E] source: 'Exceeded connection limit for user' }
+</code></pre>
+
+<p><a href="http://westplain.sakuraweb.com/translate/twitter/API-Overview/Error-Codes-and-Responses.cgi">http://westplain.sakuraweb.com/translate/twitter/API-Overview/Error-Codes-and-Responses.cgi</a></p>
+
+<blockquote>
+<p>420:速度制限に引っかかった場合に、検索APIとトレンドAPI バージョン1によって返されます。</p>
+</blockquote>
+
+<p>どうやら多重起動してるっぽい。</p>
+
+<p>errorイベントを通るたびにログ吐いてみたら、一回の接続に対して複数回発火してたので、倍々で増えちゃう。</p>
+
+<p>よくよく考えると、コネクション貼ってなくてもイベントは残るなら複数回発火は起こりえる気がしてきたので、
+落ちたかどうかをフラグ管理することにした。</p>
+
+<pre><code>setInterval(streamchk,60000);
+
+function streamchk(){
+    if(resflg==1){
+        resflg=0;
+        streamfunc();
+    }else{
+        console.log(&quot;test&quot;);
+    }
+}
+
+function streamfunc(){
+
+var stream = bot.stream('user');
+        stream.on('data', function(data) {
+                var id        = ('user' in data &amp;&amp; 'screen_name' in data.user) ? data.user.screen_name : null;
+                var text      = ('text' in data) ? data.text.replace(new RegExp('^@' + BOT_ID + ' '), '') : '';
+                var ifMention = ('in_reply_to_user_id' in data) ? (data.in_reply_to_user_id !== null) : false;
+                if(data.text === undefined){
+                }else{
+                 if(data.text.match(/【ていき】/)){
+                 }else{
+                    if(data.user.screen_name == 'plsfive'){
+                     slackpost(&quot;https://twitter.com/&quot;+data.user.screen_name+&quot;/status/&quot;+data.id_str,&quot;tw&quot;)
+                    }else{
+                     slackpost(&quot;https://twitter.com/&quot;+data.user.screen_name+&quot;/status/&quot;+data.id_str,&quot;general&quot;);
+                    }
+                 }
+                }
+        });
+stream.on('error', function(error) {
+  console.log(error);
+  resflg = 1;    
+});
+</code></pre>
+
+<p>なんか、泥臭い。
+イベント初期化のタイミングが微妙なので、これでも多重起動は100％防げるわけじゃないなあ…</p>
+
+<p>テスト繰り返してたらAPI蹴られて面倒なので一旦切りあげ。</p>
+
+<p>あえてthrow errorさせて、foreverなり、プログラムごと再起動させても解決できるけど、
+長時間ダウンしたら延々再起動しまくって負荷かけそう…。</p>
+
+<hr />
+
+<p>追記</p>
+
+<h1 id="once:f8e6c8c2cd8c5215e4823f10dd4e1f78">once</h1>
+
+<p>onceっていう、一回発火したら消えるイベント作れることを今更知った。
+ので、多重起動の問題はこれでなんとかなりそう。</p>
+
+<pre><code>main();
+
+function main(){
+    streamfunc(function(raidjs){
+              setTimeout(main,10000);
+      
+    });
+
+
+}
+function streamfunc(acallback){
+
+var stream = bot.stream('user',function(stream) {
+        stream.on('data', function(data) {
+                var id        = ('user' in data &amp;&amp; 'screen_name' in data.user) ? data.user.screen_name : null;
+                var text      = ('text' in data) ? data.text.replace(new RegExp('^@' + BOT_ID + ' '), '') : '';
+                var ifMention = ('in_reply_to_user_id' in data) ? (data.in_reply_to_user_id !== null) : false;
+                console.log(data);
+               //省略
+        });
+    stream.once('error', function(error) {
+      acallback();
+    });
+    stream.on('error', function(error) {
+      console.log(error);
+    });
+});
+
+</code></pre>
+
+<p>ある程度はこれで対応できるんじゃないかな。</p>
+
+<h1 id="フィルタ:f8e6c8c2cd8c5215e4823f10dd4e1f78">フィルタ</h1>
+
+<p>検索オプション、公式に書いてないのがあったのでちょっとまとめる。</p>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>exclude:retweets</td>
+<td>リツイート除外</td>
+</tr>
+
+<tr>
+<td>exclude:nativeretweets</td>
+<td>公式リツイート除外</td>
+</tr>
+
+<tr>
+<td>min_replies:[num]</td>
+<td>リプライ数下限</td>
+</tr>
+
+<tr>
+<td>min_retweets:[num]</td>
+<td>RT数下限</td>
+</tr>
+
+<tr>
+<td>min_faves:[num]</td>
+<td>fav数下限</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+        <footer class="post-footer clearfix">
+    
+        <p class="post-tags">
+            <span>Tagged:</span>
+            
+                 <a href="/tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0/">プログラム</a>
+            
+                 <a href="/tags/node.js/">Node.js</a>
+            
+                 <a href="/tags/twitter/">Twitter</a>
+            
+        </p>
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Twitter%e7%9b%a3%e8%a6%96%e3%83%97%e3%83%ad%e3%82%b0%e3%83%a9%e3%83%a0%e3%82%92%e3%81%a4%e3%81%8f%e3%82%8b%e3%80%82&url=http%3a%2f%2f57pfive.bitbucket.org%2fpost%2fnode_twitter%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2f57pfive.bitbucket.org%2fpost%2fnode_twitter%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2f57pfive.bitbucket.org%2fpost%2fnode_twitter%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+        
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="plsfi" href="http://57pfive.bitbucket.org/">plsfi</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://57pfive.bitbucket.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://57pfive.bitbucket.org/js/jquery.fitvids.js"></script>
+        <script src="http://57pfive.bitbucket.org/js/scripts.js"></script>
+    </body>
+</html>
+

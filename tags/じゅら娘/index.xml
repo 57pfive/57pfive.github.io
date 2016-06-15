@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>じゅら娘 on plsfi</title>
+    <link>http://57pfive.bitbucket.org/tags/%E3%81%98%E3%82%85%E3%82%89%E5%A8%98/</link>
+    <description>Recent content in じゅら娘 on plsfi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 29 May 2016 21:55:50 +0900</lastBuildDate>
+    <atom:link href="http://57pfive.bitbucket.org/tags/%E3%81%98%E3%82%85%E3%82%89%E5%A8%98/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>じゅら娘めも。</title>
+      <link>http://57pfive.bitbucket.org/post/jura/</link>
+      <pubDate>Sun, 29 May 2016 21:55:50 +0900</pubDate>
+      
+      <guid>http://57pfive.bitbucket.org/post/jura/</guid>
+      <description>
+
+&lt;p&gt;&lt;img src=&#34;http://57pfive.bitbucket.org/image/jurako/end.PNG&#34; alt=&#34;成長度、ラブ最大&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;とりあえずやるべきことは済んだので。
+忘れないように調べたこととかまとめ。&lt;/p&gt;
+
+&lt;h1 id=&#34;任務:2fa5f62bb5f16349ed5f2188319aefdf&#34;&gt;任務&lt;/h1&gt;
+
+&lt;p&gt;現状開放されてる20エリアまで。
+各エリア出現キャラは同一なので割愛。&lt;br /&gt;
+※キャンペーン時の為、消費体力半分 経験値2倍されてるので注意。&lt;/p&gt;
+
+&lt;p&gt;&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/1-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/2-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/3-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/4-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/5-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/6-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/7-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/8-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/9-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/10-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/11-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/12-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/13-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/14-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/15-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/16-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/17-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/18-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/19-1.PNG&#34;&gt;&lt;/img&gt;
+&lt;img style=&#34;display:inline-block&#34; src=&#34;http://57pfive.bitbucket.org/image/jurako/20-1.PNG&#34;&gt;&lt;/img&gt;&lt;/p&gt;
+
+&lt;p&gt;エリア１除いて、体力*2の経験値効率。
+キャンペーン時は切り上げが発生するのでエリア20うっかり走ると効率わるいの。&lt;/p&gt;
+
+&lt;h1 id=&#34;能力:2fa5f62bb5f16349ed5f2188319aefdf&#34;&gt;能力&lt;/h1&gt;
+
+&lt;p&gt;&lt;code&gt;キャラの能力値 * (1.8 * (ラブ値 / 30000) )&lt;/code&gt;&lt;br /&gt;
+成長度と覚醒値バラバラに能力値があがる？&lt;/p&gt;
+
+&lt;p&gt;※参考：N+クリプト(ラブ30000)&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;覚醒&lt;/th&gt;
+&lt;th&gt;攻撃力&lt;/th&gt;
+&lt;th&gt;防御力&lt;/th&gt;
+&lt;th&gt;成長度　&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;4500&lt;/td&gt;
+&lt;td&gt;4500&lt;/td&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;493&lt;/td&gt;
+&lt;td&gt;11490&lt;/td&gt;
+&lt;td&gt;11490&lt;/td&gt;
+&lt;td&gt;3479&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;494&lt;/td&gt;
+&lt;td&gt;11490&lt;/td&gt;
+&lt;td&gt;11490&lt;/td&gt;
+&lt;td&gt;3479&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;495&lt;/td&gt;
+&lt;td&gt;11490&lt;/td&gt;
+&lt;td&gt;11490&lt;/td&gt;
+&lt;td&gt;3482&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;496&lt;/td&gt;
+&lt;td&gt;11493&lt;/td&gt;
+&lt;td&gt;11493&lt;/td&gt;
+&lt;td&gt;3485&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;999&lt;/td&gt;
+&lt;td&gt;12177&lt;/td&gt;
+&lt;td&gt;12177&lt;/td&gt;
+&lt;td&gt;4997&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;まったくわからん… ただ、成長曲線は線形ではなさそう。&lt;/p&gt;
+
+&lt;p&gt;覚醒+5までは速さあがるらしいけどパラメータにないので知らない。&lt;/p&gt;
+
+&lt;p&gt;覚醒100+R &amp;gt; 999+N+ &amp;gt; SR&lt;/p&gt;
+
+&lt;p&gt;基本はGガチャでひたすら覚醒。
+ただRをガチャ+1出すのにおおよそ１時間弱。&lt;/p&gt;
+
+&lt;p&gt;覚醒でラブ、成長度あがるので、Gガチャ枠はアイテム入れなくてよかったかも。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;追記
+&lt;img src=&#34;http://57pfive.bitbucket.org/image/jurako/max.PNG&#34; alt=&#34;覚醒最大&#34; /&gt;
+以上、よろしくお願いいたします。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

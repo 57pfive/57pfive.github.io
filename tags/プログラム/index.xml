@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>プログラム on plsfi</title>
+    <link>http://57pfive.bitbucket.org/tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0/</link>
+    <description>Recent content in プログラム on plsfi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 01 Jun 2016 21:55:50 +0900</lastBuildDate>
+    <atom:link href="http://57pfive.bitbucket.org/tags/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Twitter監視プログラムをつくる。</title>
+      <link>http://57pfive.bitbucket.org/post/node_twitter/</link>
+      <pubDate>Wed, 01 Jun 2016 21:55:50 +0900</pubDate>
+      
+      <guid>http://57pfive.bitbucket.org/post/node_twitter/</guid>
+      <description>
+
+&lt;p&gt;Twitter見るとき、情報量多すぎてめんどくさい。
+フィルタリングかけて、slackとかメールに投げてほしい。&lt;/p&gt;
+
+&lt;h2 id=&#34;要件:f8e6c8c2cd8c5215e4823f10dd4e1f78&#34;&gt;要件&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;UserStreamをみてほしい発言が来たら、通知&lt;/li&gt;
+&lt;li&gt;定期的に検索回して、ほしい発言が来たら、通知&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.npmjs.com/package/twitter&#34;&gt;npmのパッケージ&lt;/a&gt;のコピペでUserStreamが簡単に組めた。
+飛んでくるJSON見ながら、レーン分け。
+ここまでは早かった。&lt;/p&gt;
+
+&lt;p&gt;UserStream部分&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function streamfunc(){
+
+var stream = bot.stream(&#39;user&#39;);
+        stream.on(&#39;data&#39;, function(data) {
+                var id        = (&#39;user&#39; in data &amp;amp;&amp;amp; &#39;screen_name&#39; in data.user) ? data.user.screen_name : null;
+                var text      = (&#39;text&#39; in data) ? data.text.replace(new RegExp(&#39;^@&#39; + BOT_ID + &#39; &#39;), &#39;&#39;) : &#39;&#39;;
+                var ifMention = (&#39;in_reply_to_user_id&#39; in data) ? (data.in_reply_to_user_id !== null) : false;
+                if(data.text === undefined){
+                }else{
+                    //このへんに分岐条件を書く。
+                }
+        });
+  stream.on(&#39;error&#39;, function(error) {
+    console.log(error);
+    throw error;
+    
+  });
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検索部分&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function searchfunc(sendflg){//sendflg 初回起動時に0 その後は1を入れる。
+
+        bot.get(&#39;search/tweets&#39;, {q: &#39;けんさくしたいもじ exclude:retweets&#39;}, function(error,data, response){ //exclude:retweetsでRT除外
+            data.statuses.forEach(function(val,index,ar) {
+                      var flg=0;
+                      for(var i = 0; i &amp;lt; idar.length; i++){ //配列の中身とチェックして既に入ってたら通知しない。
+                         if(idar[i] ===  val.id_str){
+                             flg = 1;
+                         }
+                      }
+                      if(flg == 0){
+                          if(sendflg==1){
+                            slackpost(&amp;quot;https://twitter.com/&amp;quot;+val.user.screen_name+&amp;quot;/status/&amp;quot;+val.id_str,&amp;quot;random&amp;quot;);
+                          }
+                          idar.push(val.id_str);  //同じ通知しないように配列にいれる。
+                      }
+            });
+        });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ひとまずこれで満足はしたけど、ほっとくとUserStream接続が切れるということが往々にある。&lt;/p&gt;
+
+&lt;p&gt;しばらく定期的に再起動かけてやり過ごしてたけど、apiのドキュメントには、再接続を実装しろって書いてあるので
+おとなしく作る。&lt;/p&gt;
+
+&lt;h1 id=&#34;userstream再接続にハマる:f8e6c8c2cd8c5215e4823f10dd4e1f78&#34;&gt;UserStream再接続にハマる&lt;/h1&gt;
+
+&lt;p&gt;npm見てもチュートリアルない。
+ひとまず、error吐いたらfunctionを再起してみる。&lt;/p&gt;
+
+&lt;p&gt;setIntervalかけて再起動&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var timer = setInterval(function(clearInterval(timer);streamfunc),60000);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;うまく起動した。&lt;/p&gt;
+
+&lt;h2 id=&#34;と-思いきや:f8e6c8c2cd8c5215e4823f10dd4e1f78&#34;&gt;と、思いきや。&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;[Error: Status Code: 420]
+{ [SyntaxError: Unexpected token E] source: &#39;Exceeded connection limit for user&#39; }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://westplain.sakuraweb.com/translate/twitter/API-Overview/Error-Codes-and-Responses.cgi&#34;&gt;http://westplain.sakuraweb.com/translate/twitter/API-Overview/Error-Codes-and-Responses.cgi&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;420:速度制限に引っかかった場合に、検索APIとトレンドAPI バージョン1によって返されます。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;どうやら多重起動してるっぽい。&lt;/p&gt;
+
+&lt;p&gt;errorイベントを通るたびにログ吐いてみたら、一回の接続に対して複数回発火してたので、倍々で増えちゃう。&lt;/p&gt;
+
+&lt;p&gt;よくよく考えると、コネクション貼ってなくてもイベントは残るなら複数回発火は起こりえる気がしてきたので、
+落ちたかどうかをフラグ管理することにした。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;setInterval(streamchk,60000);
+
+function streamchk(){
+    if(resflg==1){
+        resflg=0;
+        streamfunc();
+    }else{
+        console.log(&amp;quot;test&amp;quot;);
+    }
+}
+
+function streamfunc(){
+
+var stream = bot.stream(&#39;user&#39;);
+        stream.on(&#39;data&#39;, function(data) {
+                var id        = (&#39;user&#39; in data &amp;amp;&amp;amp; &#39;screen_name&#39; in data.user) ? data.user.screen_name : null;
+                var text      = (&#39;text&#39; in data) ? data.text.replace(new RegExp(&#39;^@&#39; + BOT_ID + &#39; &#39;), &#39;&#39;) : &#39;&#39;;
+                var ifMention = (&#39;in_reply_to_user_id&#39; in data) ? (data.in_reply_to_user_id !== null) : false;
+                if(data.text === undefined){
+                }else{
+                 if(data.text.match(/【ていき】/)){
+                 }else{
+                    if(data.user.screen_name == &#39;plsfive&#39;){
+                     slackpost(&amp;quot;https://twitter.com/&amp;quot;+data.user.screen_name+&amp;quot;/status/&amp;quot;+data.id_str,&amp;quot;tw&amp;quot;)
+                    }else{
+                     slackpost(&amp;quot;https://twitter.com/&amp;quot;+data.user.screen_name+&amp;quot;/status/&amp;quot;+data.id_str,&amp;quot;general&amp;quot;);
+                    }
+                 }
+                }
+        });
+stream.on(&#39;error&#39;, function(error) {
+  console.log(error);
+  resflg = 1;    
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;なんか、泥臭い。
+イベント初期化のタイミングが微妙なので、これでも多重起動は100％防げるわけじゃないなあ…&lt;/p&gt;
+
+&lt;p&gt;テスト繰り返してたらAPI蹴られて面倒なので一旦切りあげ。&lt;/p&gt;
+
+&lt;p&gt;あえてthrow errorさせて、foreverなり、プログラムごと再起動させても解決できるけど、
+長時間ダウンしたら延々再起動しまくって負荷かけそう…。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;追記&lt;/p&gt;
+
+&lt;h1 id=&#34;once:f8e6c8c2cd8c5215e4823f10dd4e1f78&#34;&gt;once&lt;/h1&gt;
+
+&lt;p&gt;onceっていう、一回発火したら消えるイベント作れることを今更知った。
+ので、多重起動の問題はこれでなんとかなりそう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;main();
+
+function main(){
+    streamfunc(function(raidjs){
+              setTimeout(main,10000);
+      
+    });
+
+
+}
+function streamfunc(acallback){
+
+var stream = bot.stream(&#39;user&#39;,function(stream) {
+        stream.on(&#39;data&#39;, function(data) {
+                var id        = (&#39;user&#39; in data &amp;amp;&amp;amp; &#39;screen_name&#39; in data.user) ? data.user.screen_name : null;
+                var text      = (&#39;text&#39; in data) ? data.text.replace(new RegExp(&#39;^@&#39; + BOT_ID + &#39; &#39;), &#39;&#39;) : &#39;&#39;;
+                var ifMention = (&#39;in_reply_to_user_id&#39; in data) ? (data.in_reply_to_user_id !== null) : false;
+                console.log(data);
+               //省略
+        });
+    stream.once(&#39;error&#39;, function(error) {
+      acallback();
+    });
+    stream.on(&#39;error&#39;, function(error) {
+      console.log(error);
+    });
+});
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ある程度はこれで対応できるんじゃないかな。&lt;/p&gt;
+
+&lt;h1 id=&#34;フィルタ:f8e6c8c2cd8c5215e4823f10dd4e1f78&#34;&gt;フィルタ&lt;/h1&gt;
+
+&lt;p&gt;検索オプション、公式に書いてないのがあったのでちょっとまとめる。&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;exclude:retweets&lt;/td&gt;
+&lt;td&gt;リツイート除外&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;exclude:nativeretweets&lt;/td&gt;
+&lt;td&gt;公式リツイート除外&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;min_replies:[num]&lt;/td&gt;
+&lt;td&gt;リプライ数下限&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;min_retweets:[num]&lt;/td&gt;
+&lt;td&gt;RT数下限&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;min_faves:[num]&lt;/td&gt;
+&lt;td&gt;fav数下限&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
